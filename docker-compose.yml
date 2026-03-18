@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:18.3
+    container_name: candidate-service-postgres
+    environment:
+      POSTGRES_DB: candidate_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - candidate-service-pg-data:/var/lib/postgresql
+
+volumes:
+  candidate-service-pg-data:
