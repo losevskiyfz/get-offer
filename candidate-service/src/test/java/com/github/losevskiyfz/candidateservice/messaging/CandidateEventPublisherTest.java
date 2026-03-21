@@ -1,5 +1,6 @@
 package com.github.losevskiyfz.candidateservice.messaging;
 
+import com.github.losevskiyfz.candidateservice.config.properties.KafkaTopicsProperties;
 import com.github.losevskiyfz.candidateservice.entity.Candidate;
 import com.github.losevskiyfz.candidateservice.entity.Grade;
 import com.github.losevskiyfz.candidateservice.event.CandidateCreatedEvent;
@@ -33,8 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @EmbeddedKafka(
-        partitions = 1,
-        topics = KafkaTopics.CANDIDATE_CREATED
+        topics = "candidate-created",
+        partitions = 1
 )
 @TestPropertySource(properties = {
         "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
@@ -48,6 +49,9 @@ class CandidateEventPublisherTest {
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
+
+    @Autowired
+    private KafkaTopicsProperties kafkaTopicsProperties;
 
     private KafkaMessageListenerContainer<String, CandidateCreatedEvent> container;
     private BlockingQueue<ConsumerRecord<String, CandidateCreatedEvent>> records;
@@ -67,8 +71,10 @@ class CandidateEventPublisherTest {
         DefaultKafkaConsumerFactory<String, CandidateCreatedEvent> consumerFactory =
                 new DefaultKafkaConsumerFactory<>(consumerProps);
 
+        KafkaTopicsProperties.TopicProperties topicProperties =
+                kafkaTopicsProperties.getTopics().get("candidate-created");
         ContainerProperties containerProperties =
-                new ContainerProperties(KafkaTopics.CANDIDATE_CREATED);
+                new ContainerProperties(topicProperties.getName());
 
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
         container.setupMessageListener(
@@ -76,7 +82,7 @@ class CandidateEventPublisherTest {
         );
         container.start();
 
-        ContainerTestUtils.waitForAssignment(container, 1);
+        ContainerTestUtils.waitForAssignment(container, topicProperties.getPartitions());
     }
 
     @AfterEach
