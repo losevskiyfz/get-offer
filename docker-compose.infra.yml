@@ -60,6 +60,11 @@ services:
       - "49094:9094"
     volumes:
       - kafka-3-data:/var/lib/kafka/data
+  redis:
+    image: redis:8.6.1
+    container_name: calculation-service-redis
+    ports:
+      - "6379:6379"
 volumes:
   candidate-service-pg-data:
   kafka-1-data:
