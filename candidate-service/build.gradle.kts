@@ -18,6 +18,10 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
+
 }
 
 tasks.withType<Test> {
