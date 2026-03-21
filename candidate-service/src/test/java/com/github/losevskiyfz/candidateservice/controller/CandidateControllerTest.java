@@ -67,23 +67,120 @@ public class CandidateControllerTest {
         }
 
         @Test
-        void shouldReturn400onGradeValidationError() {
+        void shouldReturn400WhenNameIsNull() {
+            CandidateRequest request = new CandidateRequest(null, Grade.JUNIOR, 0, BigDecimal.valueOf(400));
 
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
         }
 
         @Test
-        void shouldReturn400onNameValidationError() {
+        void shouldReturn400WhenNameIsBlank() {
+            CandidateRequest request = new CandidateRequest("", Grade.JUNIOR, 0, BigDecimal.valueOf(400));
 
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
         }
 
         @Test
-        void shouldReturn400onSalaryValidationError() {
+        void shouldReturn400WhenNameExceeds255Characters() {
+            String longName = "a".repeat(256);
+            CandidateRequest request = new CandidateRequest(longName, Grade.JUNIOR, 0, BigDecimal.valueOf(400));
 
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
         }
 
         @Test
-        void shouldReturn400onExperienceYearsValidationError() {
+        void shouldReturn400WhenGradeIsNull() {
+            CandidateRequest request = new CandidateRequest("Ivan", null, 0, BigDecimal.valueOf(400));
 
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void shouldReturn400WhenGradeIsInvalid() {
+            String rawJson = """
+                    {
+                        "name": "Ivan",
+                        "grade": "INVALID_GRADE",
+                        "experienceYears": 0,
+                        "salary": 400
+                    }
+                    """;
+
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(rawJson)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void shouldReturn400WhenSalaryIsNull() {
+            CandidateRequest request = new CandidateRequest("Ivan", Grade.JUNIOR, 0, null);
+
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void shouldReturn400WhenSalaryIsNegative() {
+            CandidateRequest request = new CandidateRequest("Ivan", Grade.JUNIOR, 0, BigDecimal.valueOf(-1));
+
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void shouldReturn400WhenExperienceYearsIsNull() {
+            CandidateRequest request = new CandidateRequest("Ivan", Grade.JUNIOR, null, BigDecimal.valueOf(400));
+
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void shouldReturn400WhenExperienceYearsIsNegative() {
+            CandidateRequest request = new CandidateRequest("Ivan", Grade.JUNIOR, -1, BigDecimal.valueOf(400));
+
+            restTestClient.post()
+                    .uri("/api/v1/candidates")
+                    .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
         }
     }
 
@@ -91,6 +188,7 @@ public class CandidateControllerTest {
     @DisplayName("GET " + BASE_URI + "/{id}")
     class GetCandidate {
         private final String BASE_GET_URI = BASE_URI + "/{id}";
+
         @Test
         void shouldReturn200WithCandidate() {
             // given
