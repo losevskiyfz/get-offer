@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @WebMvcTest(CandidateController.class)
 @AutoConfigureRestTestClient
-public class CandidateControllerTest {
+class CandidateControllerTest {
     @Autowired
     private RestTestClient restTestClient;
     @MockitoBean

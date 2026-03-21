@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -24,7 +25,8 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-
+    testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
 }
 
 tasks.withType<Test> {
