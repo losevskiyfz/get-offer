@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+// TODO - implement transactional outbox
 @Component
 public class CandidateEventPublisher {
     private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisher.class);

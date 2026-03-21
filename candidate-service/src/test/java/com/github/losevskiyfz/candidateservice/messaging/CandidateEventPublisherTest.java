@@ -42,7 +42,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.kafka.consumer.auto-offset-reset=earliest"
+        "spring.kafka.consumer.auto-offset-reset=earliest",
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration," +
+                "org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration"
 })
 class CandidateEventPublisherTest {
     private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisherTest.class);
@@ -71,6 +75,8 @@ class CandidateEventPublisherTest {
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
         consumerProps.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "*");
         consumerProps.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, CandidateCreatedEvent.class.getName());
+        consumerProps.put(JacksonJsonDeserializer.TYPE_MAPPINGS,
+                "candidateCreated:com.github.losevskiyfz.candidateservice.event.CandidateCreatedEvent");
 
         DefaultKafkaConsumerFactory<String, CandidateCreatedEvent> consumerFactory =
                 new DefaultKafkaConsumerFactory<>(consumerProps);
