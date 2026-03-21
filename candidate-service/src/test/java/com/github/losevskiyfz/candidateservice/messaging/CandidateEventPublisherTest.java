@@ -10,6 +10,8 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -43,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.kafka.consumer.auto-offset-reset=earliest"
 })
 class CandidateEventPublisherTest {
+    private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisherTest.class);
 
     @Autowired
     private CandidateEventPublisher candidateEventPublisher;
@@ -58,6 +61,7 @@ class CandidateEventPublisherTest {
 
     @BeforeEach
     void setUp() {
+        log.info("Setting up test consumer for topic: candidate-created");
         records = new LinkedBlockingQueue<>();
 
         Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(
@@ -83,11 +87,14 @@ class CandidateEventPublisherTest {
         container.start();
 
         ContainerTestUtils.waitForAssignment(container, topicProperties.getPartitions());
+        log.info("Test consumer started and partition assigned");
     }
 
     @AfterEach
     void tearDown() {
+        log.info("Stopping test consumer");
         container.stop();
+        log.info("Test consumer stopped");
     }
 
     @Test
@@ -99,15 +106,18 @@ class CandidateEventPublisherTest {
         candidate.setGrade(Grade.JUNIOR);
         candidate.setExperienceYears(0);
         candidate.setSalary(BigDecimal.valueOf(400));
+        log.info("Publishing CandidateCreatedEvent for candidate: id={}", candidate.getId());
 
         // when
         candidateEventPublisher.publishCandidateCreated(candidate);
 
         // then
+        log.info("Waiting for message to arrive in topic...");
         ConsumerRecord<String, CandidateCreatedEvent> record =
                 records.poll(5, TimeUnit.SECONDS);
 
         assertThat(record).isNotNull();
+        log.info("Message received: topic={}, key={}, offset={}", record.topic(), record.key(), record.offset());
         assertThat(record.key()).isEqualTo(candidate.getId().toString());
         assertThat(record.value().id()).isEqualTo(candidate.getId());
         assertThat(record.value().name()).isEqualTo("Ivan");
