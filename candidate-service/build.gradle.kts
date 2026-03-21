@@ -30,7 +30,3 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
 }
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
