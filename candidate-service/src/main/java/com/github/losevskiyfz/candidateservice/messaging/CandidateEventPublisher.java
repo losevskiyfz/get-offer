@@ -4,11 +4,15 @@ import com.github.losevskiyfz.candidateservice.config.properties.KafkaTopicsProp
 import com.github.losevskiyfz.candidateservice.entity.Candidate;
 import com.github.losevskiyfz.candidateservice.event.CandidateCreatedEvent;
 import com.github.losevskiyfz.candidateservice.mapper.CandidateMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CandidateEventPublisher {
+    private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisher.class);
+
     private final KafkaTemplate<String, CandidateCreatedEvent> kafkaTemplate;
     private final CandidateMapper candidateMapper;
     private final KafkaTopicsProperties kafkaTopicsProperties;
@@ -25,10 +29,18 @@ public class CandidateEventPublisher {
 
     public void publishCandidateCreated(Candidate candidate) {
         CandidateCreatedEvent event = candidateMapper.toCreatedEvent(candidate);
-        kafkaTemplate.send(
-                kafkaTopicsProperties.getTopics().get("candidate-created").getName(),
-                candidate.getId().toString(),
-                event
-        );
+        String topic = kafkaTopicsProperties.getTopics().get("candidate-created").getName();
+        String key = candidate.getId().toString();
+        log.debug("Publishing CandidateCreatedEvent: topic={}, key={}", topic, key);
+        kafkaTemplate.send(topic, key, event)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.error("Failed to publish CandidateCreatedEvent: topic={}, key={}, error={}",
+                                topic, key, ex.getMessage());
+                    } else {
+                        log.debug("CandidateCreatedEvent published successfully: topic={}, key={}, offset={}",
+                                topic, key, result.getRecordMetadata().offset());
+                    }
+                });
     }
 }
