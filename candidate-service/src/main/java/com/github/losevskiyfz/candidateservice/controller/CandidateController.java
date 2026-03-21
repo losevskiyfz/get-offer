@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/candidates")
-public class CandidateController {
+public class CandidateController implements CandidateApi{
     private final CandidateService candidateService;
 
     public CandidateController(CandidateService candidateService) {
@@ -21,6 +21,7 @@ public class CandidateController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<CandidateResponse> saveCandidate(@Valid @RequestBody CandidateRequest requestBody) {
         CandidateResponse responseBody = candidateService.create(requestBody);
         URI location = ServletUriComponentsBuilder
@@ -32,6 +33,7 @@ public class CandidateController {
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<CandidateResponse> getCandidate(@PathVariable UUID id) {
         CandidateResponse responseBody = candidateService.getById(id);
         return ResponseEntity.ok(responseBody);
