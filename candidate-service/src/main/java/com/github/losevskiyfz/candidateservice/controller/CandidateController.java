@@ -3,6 +3,7 @@ package com.github.losevskiyfz.candidateservice.controller;
 import com.github.losevskiyfz.candidateservice.dto.CandidateRequest;
 import com.github.losevskiyfz.candidateservice.dto.CandidateResponse;
 import com.github.losevskiyfz.candidateservice.service.CandidateService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,7 +21,7 @@ public class CandidateController {
     }
 
     @PostMapping
-    public ResponseEntity<CandidateResponse> saveCandidate(@RequestBody CandidateRequest requestBody) {
+    public ResponseEntity<CandidateResponse> saveCandidate(@Valid @RequestBody CandidateRequest requestBody) {
         CandidateResponse responseBody = candidateService.create(requestBody);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
