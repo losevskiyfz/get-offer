@@ -60,17 +60,6 @@ services:
       - "49094:9094"
     volumes:
       - kafka-3-data:/var/lib/kafka/data
-  kafka-init:
-    image: apache/kafka:4.2.0
-    container_name: kafka-init
-    depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
-    volumes:
-      - ./init-kafka-topics.sh:/init-kafka-topics.sh
-    entrypoint: [ "/bin/sh", "/init-kafka-topics.sh" ]
-    restart: "no"
 volumes:
   candidate-service-pg-data:
   kafka-1-data:
