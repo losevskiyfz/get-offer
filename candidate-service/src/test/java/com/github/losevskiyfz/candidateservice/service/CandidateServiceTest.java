@@ -6,6 +6,7 @@ import com.github.losevskiyfz.candidateservice.entity.Candidate;
 import com.github.losevskiyfz.candidateservice.entity.Grade;
 import com.github.losevskiyfz.candidateservice.exception.CandidateNotFoundException;
 import com.github.losevskiyfz.candidateservice.mapper.CandidateMapper;
+import com.github.losevskiyfz.candidateservice.messaging.CandidateEventPublisher;
 import com.github.losevskiyfz.candidateservice.repository.CandidateRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,10 @@ class CandidateServiceTest {
 
     @Mock
     CandidateMapper candidateMapper;
+
+    @Mock
+    CandidateEventPublisher candidateEventPublisher;
+
 
     @InjectMocks
     CandidateService candidateService;
