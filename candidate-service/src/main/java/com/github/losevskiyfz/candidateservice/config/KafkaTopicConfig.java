@@ -20,12 +20,16 @@ public class KafkaTopicConfig {
                 .map(t -> {
                     log.info("Initializing Kafka topic: name={}, partitions={}, replicas={}",
                             t.getName(), t.getPartitions(), t.getReplicas());
-                    return TopicBuilder.name(t.getName())
+                    TopicBuilder builder = TopicBuilder.name(t.getName())
                             .partitions(t.getPartitions())
-                            .replicas(t.getReplicas())
-                            .config(TopicConfig.RETENTION_MS_CONFIG, t.getRetentionMs())
-                            .config(TopicConfig.RETENTION_BYTES_CONFIG, t.getRetentionBytes())
-                            .build();
+                            .replicas(t.getReplicas());
+                    if (t.getRetentionMs() != null) {
+                        builder.config(TopicConfig.RETENTION_MS_CONFIG, t.getRetentionMs());
+                    }
+                    if (t.getRetentionBytes() != null) {
+                        builder.config(TopicConfig.RETENTION_BYTES_CONFIG, t.getRetentionBytes());
+                    }
+                    return builder.build();
                 })
                 .toArray(NewTopic[]::new);
         return new NewTopics(topics);

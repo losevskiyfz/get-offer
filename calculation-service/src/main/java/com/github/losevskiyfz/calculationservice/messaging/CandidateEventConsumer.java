@@ -27,7 +27,7 @@ public class CandidateEventConsumer {
     }
 
     // TODO - add dead letter topic on errors
-    @KafkaListener(topics = "${kafka.topics.candidate-created.name}")
+    @KafkaListener(topics = "${kafka.listener.topics.candidate-created.name}")
     public void handle(
             @Payload CandidateCreatedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,

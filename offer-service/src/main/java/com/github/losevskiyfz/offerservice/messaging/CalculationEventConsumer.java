@@ -20,7 +20,7 @@ public class CalculationEventConsumer {
         this.offerService = offerService;
     }
 
-    @KafkaListener(topics = "${kafka.topics.calculation-completed.name}")
+    @KafkaListener(topics = "${kafka.listener.topics.calculation-completed.name}")
     public void consume(
             @Payload CalculationCompletedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
