@@ -1,5 +1,6 @@
 package com.github.losevskiyfz.candidateservice.messaging;
 
+import com.github.losevskiyfz.candidateservice.base.annotation.EnableKafka;
 import com.github.losevskiyfz.candidateservice.config.properties.KafkaTopicsProperties;
 import com.github.losevskiyfz.candidateservice.entity.Candidate;
 import com.github.losevskiyfz.candidateservice.entity.Grade;
@@ -13,19 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -35,19 +34,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@EmbeddedKafka(
-        topics = "candidate-created",
-        partitions = 1
-)
-@TestPropertySource(properties = {
-        "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.kafka.consumer.auto-offset-reset=earliest",
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration," +
-                "org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration"
-})
+@EnableKafka
 class CandidateEventPublisherTest {
     private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisherTest.class);
 
@@ -55,22 +42,22 @@ class CandidateEventPublisherTest {
     private CandidateEventPublisher candidateEventPublisher;
 
     @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
-
-    @Autowired
     private KafkaTopicsProperties kafkaTopicsProperties;
 
     private KafkaMessageListenerContainer<String, CandidateCreatedEvent> container;
     private BlockingQueue<ConsumerRecord<String, CandidateCreatedEvent>> records;
+    @Value("${spring.kafka.producer.bootstrap-servers}")
+    private String bootstrapServers;
 
     @BeforeEach
     void setUp() {
         log.info("Setting up test consumer for topic: candidate-created");
         records = new LinkedBlockingQueue<>();
 
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(
-                embeddedKafkaBroker, "test-group", true
-        );
+        Map<String, Object> consumerProps = new HashMap<>();
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
+        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
         consumerProps.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "*");
@@ -78,15 +65,13 @@ class CandidateEventPublisherTest {
         consumerProps.put(JacksonJsonDeserializer.TYPE_MAPPINGS,
                 "candidateCreated:com.github.losevskiyfz.candidateservice.event.CandidateCreatedEvent");
 
-        DefaultKafkaConsumerFactory<String, CandidateCreatedEvent> consumerFactory =
-                new DefaultKafkaConsumerFactory<>(consumerProps);
-
         KafkaTopicsProperties.TopicProperties topicProperties =
                 kafkaTopicsProperties.getTopics().get("candidate-created");
-        ContainerProperties containerProperties =
-                new ContainerProperties(topicProperties.getName());
 
-        container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
+        container = new KafkaMessageListenerContainer<>(
+                new DefaultKafkaConsumerFactory<>(consumerProps),
+                new ContainerProperties(topicProperties.getName())
+        );
         container.setupMessageListener(
                 (MessageListener<String, CandidateCreatedEvent>) records::add
         );
