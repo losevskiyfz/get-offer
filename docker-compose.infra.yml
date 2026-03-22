@@ -65,8 +65,19 @@ services:
     container_name: calculation-service-redis
     ports:
       - "6379:6379"
+    volumes:
+      - calculation-service-redis-data:/data
+  mongo:
+    image: mongo:8.2.6
+    container_name: offer-service-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - offer-service-mongo-data:/data/db
 volumes:
   candidate-service-pg-data:
   kafka-1-data:
   kafka-2-data:
   kafka-3-data:
+  calculation-service-redis-data:
+  offer-service-mongo-data:
