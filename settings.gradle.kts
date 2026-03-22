@@ -1,3 +1,3 @@
 rootProject.name = "get-offer"
 
-include("candidate-service", "calculation-service")
+include("candidate-service", "calculation-service", "offer-service")
