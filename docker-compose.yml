@@ -3,7 +3,7 @@ include:
 
 services:
   candidate-service:
-    image: losevskiyfz/candidate-service:0.0.1
+    image: losevskiyfz/candidate-service:0.0.3
     container_name: candidate-service
     ports:
       - "8080:8080"
@@ -19,7 +19,7 @@ services:
       - kafka-3
 
   calculation-service:
-    image: losevskiyfz/calculation-service:0.0.1
+    image: losevskiyfz/calculation-service:0.0.3
     container_name: calculation-service
     ports:
       - "8081:8081"
@@ -34,7 +34,7 @@ services:
       - kafka-3
 
   offer-service:
-    image: losevskiyfz/offer-service:0.0.2
+    image: losevskiyfz/offer-service:0.0.3
     container_name: offer-service
     ports:
       - "8082:8082"

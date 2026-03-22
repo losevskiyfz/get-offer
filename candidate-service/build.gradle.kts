@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.github.losevskiyfz"
-version = "0.0.1"
+version = "0.0.3"
 description = "candidate-service"
 
 dependencies {
@@ -14,10 +14,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
-
     implementation(libs.springdoc.openapi)
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-liquibase-test")

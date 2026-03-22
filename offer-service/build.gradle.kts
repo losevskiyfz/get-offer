@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.github.losevskiyfz"
-version = "0.0.2"
+version = "0.0.3"
 description = "offer-service"
 
 dependencies {
@@ -22,4 +22,5 @@ dependencies {
 	testImplementation("org.testcontainers:testcontainers-kafka")
 	testImplementation("org.testcontainers:testcontainers-mongodb")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
