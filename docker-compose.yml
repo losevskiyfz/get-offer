@@ -1,0 +1,49 @@
+include:
+  - docker-compose.infra.yml
+
+services:
+  candidate-service:
+    image: losevskiyfz/candidate-service:0.0.1
+    container_name: candidate-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://candidate-service-postgres:5432/candidate_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+    depends_on:
+      - postgres
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+  calculation-service:
+    image: losevskiyfz/calculation-service:0.0.1
+    container_name: calculation-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+      SPRING_DATA_REDIS_HOST: calculation-service-redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+  offer-service:
+    image: losevskiyfz/offer-service:0.0.1
+    container_name: offer-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+      SPRING_DATA_MONGODB_URI: mongodb://offer-service-mongo:27017/offer_service
+      SPRING_DATA_MONGODB_UUID_REPRESENTATION: standard
+    depends_on:
+      - mongo
+      - kafka-1
+      - kafka-2
+      - kafka-3
