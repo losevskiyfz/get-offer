@@ -20,6 +20,7 @@ public class CalculationEventConsumer {
         this.offerService = offerService;
     }
 
+    // TODO - add dead letter topic on errors
     @KafkaListener(topics = "${kafka.listener.topics.calculation-completed.name}")
     public void consume(
             @Payload CalculationCompletedEvent event,
