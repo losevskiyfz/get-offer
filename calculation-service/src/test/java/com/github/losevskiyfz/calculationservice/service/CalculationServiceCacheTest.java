@@ -1,6 +1,7 @@
 package com.github.losevskiyfz.calculationservice.service;
 
 import com.github.losevskiyfz.calculationservice.base.RedisIntegrationTest;
+import com.github.losevskiyfz.calculationservice.base.annotation.EnableRedis;
 import com.github.losevskiyfz.calculationservice.event.CalculationCompletedEvent;
 import com.github.losevskiyfz.calculationservice.event.CandidateCreatedEvent;
 import com.github.losevskiyfz.calculationservice.event.Grade;
@@ -21,7 +22,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-class CalculationServiceCacheTest extends RedisIntegrationTest {
+@EnableRedis
+class CalculationServiceCacheTest {
 
     @MockitoSpyBean
     private CalculationService calculationService;
