@@ -1,35 +1,43 @@
 package com.github.losevskiyfz.calculationservice.messaging;
 
-import com.github.losevskiyfz.calculationservice.event.CalculationCompletedEvent;
+import com.github.losevskiyfz.calculationservice.base.annotation.EnableKafka;
+import com.github.losevskiyfz.calculationservice.base.annotation.EnableRedis;
 import com.github.losevskiyfz.calculationservice.event.CandidateCreatedEvent;
 import com.github.losevskiyfz.calculationservice.event.Grade;
 import com.github.losevskiyfz.calculationservice.service.CalculationService;
+import com.github.losevskiyfz.calculationservice.event.CalculationCompletedEvent;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@EnableKafka
+@EnableRedis
 class CandidateEventConsumerTest {
 
-    @Mock
+    @Autowired
+    private KafkaTemplate<String, CandidateCreatedEvent> kafkaTemplate;
+
+    @MockitoBean
     private CalculationService calculationService;
 
-    @Mock
+    @MockitoBean
     private CalculationEventPublisher calculationEventPublisher;
-
-    @InjectMocks
-    private CandidateEventConsumer candidateEventConsumer;
 
     @Test
     void shouldInvokeCalculationServiceOnEvent() {
+        // given
         CandidateCreatedEvent event = new CandidateCreatedEvent(
                 UUID.randomUUID(), "Alice", Grade.MIDDLE, 3, new BigDecimal("1000")
         );
@@ -38,15 +46,20 @@ class CandidateEventConsumerTest {
                 event.salary(), new BigDecimal("1000"),
                 BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE
         );
-        when(calculationService.calculate(event)).thenReturn(result);
+        when(calculationService.calculate(any())).thenReturn(result);
 
-        candidateEventConsumer.handle(event);
+        // when
+        kafkaTemplate.send("candidate-created", event.id().toString(), event);
 
-        verify(calculationService).calculate(event);
+        // then
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() ->
+                verify(calculationService).calculate(any(CandidateCreatedEvent.class))
+        );
     }
 
     @Test
     void shouldPublishCalculationCompletedEventAfterCalculation() {
+        // given
         CandidateCreatedEvent event = new CandidateCreatedEvent(
                 UUID.randomUUID(), "Bob", Grade.SENIOR, 5, new BigDecimal("2000")
         );
@@ -55,10 +68,14 @@ class CandidateEventConsumerTest {
                 event.salary(), new BigDecimal("3120"),
                 new BigDecimal("1.2"), new BigDecimal("1.3"), BigDecimal.ONE
         );
-        when(calculationService.calculate(event)).thenReturn(result);
+        when(calculationService.calculate(any())).thenReturn(result);
 
-        candidateEventConsumer.handle(event);
+        // when
+        kafkaTemplate.send("candidate-created", event.id().toString(), event);
 
-        verify(calculationEventPublisher).publishCalculationCompleted(result);
+        // then
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() ->
+                verify(calculationEventPublisher).publishCalculationCompleted(any(CalculationCompletedEvent.class))
+        );
     }
 }

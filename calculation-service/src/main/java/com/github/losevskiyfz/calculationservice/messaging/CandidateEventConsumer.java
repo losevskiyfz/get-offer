@@ -6,6 +6,9 @@ import com.github.losevskiyfz.calculationservice.service.CalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,9 +28,14 @@ public class CandidateEventConsumer {
 
     // TODO - add dead letter topic on errors
     @KafkaListener(topics = "${kafka.topics.candidate-created.name}")
-    public void handle(CandidateCreatedEvent event) {
-        log.debug("Received CandidateCreatedEvent: id={}, name={}, grade={}",
-                event.id(), event.name(), event.grade());
+    public void handle(
+            @Payload CandidateCreatedEvent event,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Header(KafkaHeaders.OFFSET) long offset,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition
+    ) {
+        log.debug("Received CandidateCreatedEvent: key={}, partition={}, offset={}, id={}, name={}, grade={}",
+                key, partition, offset, event.id(), event.name(), event.grade());
         CalculationCompletedEvent result = calculationService.calculate(event);
         log.debug("Calculation completed: candidateId={}, recommendedSalary={}",
                 result.candidateId(), result.recommendedSalary());
