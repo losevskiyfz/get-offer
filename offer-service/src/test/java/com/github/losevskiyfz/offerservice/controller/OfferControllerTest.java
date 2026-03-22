@@ -77,7 +77,7 @@ class OfferControllerTest {
                     .jsonPath("$.content[0].candidateId").isEqualTo(candidateId.toString())
                     .jsonPath("$.content[0].candidateName").isEqualTo("Alice")
                     .jsonPath("$.content[0].grade").isEqualTo(Grade.SENIOR.name())
-                    .jsonPath("$.totalElements").isEqualTo(1);
+                    .jsonPath("$.page.totalElements").isEqualTo(1);
         }
 
         @Test
@@ -94,7 +94,7 @@ class OfferControllerTest {
                     .expectStatus().isOk()
                     .expectBody()
                     .jsonPath("$.content").isArray()
-                    .jsonPath("$.totalElements").isEqualTo(0);
+                    .jsonPath("$.page.totalElements").isEqualTo(0);
         }
     }
 

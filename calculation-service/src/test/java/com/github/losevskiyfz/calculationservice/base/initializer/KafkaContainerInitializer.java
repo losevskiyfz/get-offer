@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName;
 public class KafkaContainerInitializer
         implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    static final KafkaContainer KAFKA =
+    public static final KafkaContainer KAFKA =
             new KafkaContainer(DockerImageName.parse("apache/kafka:4.2.0"));
 
     static {

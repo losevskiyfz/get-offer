@@ -49,19 +49,21 @@ class CalculationEventPublisherTest {
 
     private KafkaMessageListenerContainer<String, CalculationCompletedEvent> container;
     private BlockingQueue<ConsumerRecord<String, CalculationCompletedEvent>> records;
-    @Value("${spring.kafka.producer.bootstrap-servers}")
-    private String bootstrapServers;
+    @Value("${spring.kafka.producer.properties.spring.json.type.mapping}")
+    private String typeMapping;
 
     @BeforeEach
     void setUp() {
         records = new LinkedBlockingQueue<>();
 
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                KafkaContainerInitializer.KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
+        consumerProps.put(JacksonJsonDeserializer.TYPE_MAPPINGS, typeMapping);
         consumerProps.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "*");
         consumerProps.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE,
                 CalculationCompletedEvent.class.getName());
