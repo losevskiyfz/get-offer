@@ -28,7 +28,7 @@ public class CalculationEventConsumer {
             @Header(KafkaHeaders.OFFSET) long offset,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition
     ) {
-        log.info("Received CalculationCompletedEvent: key={}, partition={}, offset={}, candidateId={}",
+        log.debug("Received CalculationCompletedEvent: key={}, partition={}, offset={}, candidateId={}",
                 key, partition, offset, event.candidateId());
         offerService.createOffer(event);
     }

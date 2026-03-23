@@ -31,13 +31,13 @@ public class OfferController implements OfferApi {
     public ResponseEntity<Page<Offer>> getOffers(
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
     ) {
-        log.info("GET {}: page={}, size={}", BASE_URL, pageable.getPageNumber(), pageable.getPageSize());
+        log.debug("GET {}: page={}, size={}", BASE_URL, pageable.getPageNumber(), pageable.getPageSize());
         return ResponseEntity.ok(offerService.getOffers(pageable));
     }
 
     @GetMapping("/candidates/{candidateId}")
     public ResponseEntity<Offer> getLatestOffer(@PathVariable UUID candidateId) {
-        log.info("GET {}/candidates/{}", BASE_URL, candidateId);
+        log.debug("GET {}/candidates/{}", BASE_URL, candidateId);
         return ResponseEntity.ok(offerService.getLatestOffer(candidateId));
     }
 }
