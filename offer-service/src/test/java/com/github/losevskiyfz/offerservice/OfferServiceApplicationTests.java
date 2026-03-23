@@ -5,7 +5,6 @@ import com.github.losevskiyfz.offerservice.base.annotation.EnableMongo;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@EnableKafka
 @EnableMongo
 @SpringBootTest
 class OfferServiceApplicationTests {
