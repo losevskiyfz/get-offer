@@ -41,7 +41,7 @@ public class OfferService {
     }
 
     public Offer getLatestOffer(UUID candidateId) {
-        log.info("Fetching latest offer for candidateId={}", candidateId);
+        log.debug("Fetching latest offer for candidateId={}", candidateId);
         return offerRepository.findTopByCandidateIdOrderByCreatedAtDesc(candidateId)
                 .orElseThrow(() -> new OfferNotFoundException(candidateId));
     }
