@@ -19,7 +19,7 @@ public class MongoContainerInitializer
     @Override
     public void initialize(ConfigurableApplicationContext ctx) {
         TestPropertyValues.of(
-                "spring.data.mongodb.uri=" + MONGO.getReplicaSetUrl("offer_service")
+                "spring.mongodb.uri=" + MONGO.getReplicaSetUrl("offer_service")
         ).applyTo(ctx.getEnvironment());
     }
 }
