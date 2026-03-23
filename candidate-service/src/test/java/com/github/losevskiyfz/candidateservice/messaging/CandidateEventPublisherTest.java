@@ -1,6 +1,6 @@
 package com.github.losevskiyfz.candidateservice.messaging;
 
-import com.github.losevskiyfz.candidateservice.base.annotation.EnableKafka;
+import com.github.losevskiyfz.candidateservice.base.annotation.EnablePostgresAndKafka;
 import com.github.losevskiyfz.candidateservice.config.properties.KafkaTopicsProperties;
 import com.github.losevskiyfz.candidateservice.entity.Candidate;
 import com.github.losevskiyfz.candidateservice.entity.Grade;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@EnableKafka
+@EnablePostgresAndKafka
 class CandidateEventPublisherTest {
     private static final Logger log = LoggerFactory.getLogger(CandidateEventPublisherTest.class);
 
