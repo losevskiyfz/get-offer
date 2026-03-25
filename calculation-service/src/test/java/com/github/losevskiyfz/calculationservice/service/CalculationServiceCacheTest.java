@@ -1,6 +1,5 @@
 package com.github.losevskiyfz.calculationservice.service;
 
-import com.github.losevskiyfz.calculationservice.base.RedisIntegrationTest;
 import com.github.losevskiyfz.calculationservice.base.annotation.EnableRedis;
 import com.github.losevskiyfz.calculationservice.event.CalculationCompletedEvent;
 import com.github.losevskiyfz.calculationservice.event.CandidateCreatedEvent;
