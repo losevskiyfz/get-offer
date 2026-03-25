@@ -38,6 +38,9 @@ class CalculationServiceCacheTest {
         );
 
         CalculationCompletedEvent first = calculationService.calculate(event);
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() ->
+                assertThat(cacheManager.getCache("calculations").get(id.toString())).isNotNull()
+        );
         CalculationCompletedEvent second = calculationService.calculate(event);
 
         verify(calculationService, times(1)).calculate(event);
